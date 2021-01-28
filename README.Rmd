@@ -57,7 +57,7 @@ tjsp2inst::tjsp2inst %>%
     y = "Câmara", 
     title = "Taxas de reforma por câmara",
     subtitle = "Considerando três áreas do direito", 
-    caption = "* Casos sem decisão de mérido foram desconsiderados"
+    caption = "* Casos sem decisão de mérito foram desconsiderados"
   )
 ```
 
