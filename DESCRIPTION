@@ -1,13 +1,15 @@
 Package: tjsp2inst
-Title: What the Package Does (One Line, Title Case)
+Title: Base Jurisprudencia TJSP
+Description: Base da jurisprudencia do TJSP, obtida diretamente do site usando
+  raspagem de dados.
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
-           role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+    c(person('Julio', 'Trecenti', 
+             email = 'julio.trecenti@gmail.com', 
+             role = c('cre', 'aut'),
+             comment = c(ORCID = "0000-0002-1680-6389")),
+      person(given = "Associação Brasileira de Jurimetria",
+             role = c("cph", "fnd")))
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -15,3 +17,5 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Imports: 
     magrittr
+Depends: 
+    R (>= 2.10)
