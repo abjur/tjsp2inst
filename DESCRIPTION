@@ -2,7 +2,7 @@ Package: tjsp2inst
 Title: Base Jurisprudencia TJSP
 Description: Base da jurisprudencia do TJSP, obtida diretamente do site usando
   raspagem de dados.
-Version: 0.1.0
+Version: 0.1.0.9000
 Authors@R: 
     c(person('Julio', 'Trecenti', 
              email = 'julio.trecenti@gmail.com', 
