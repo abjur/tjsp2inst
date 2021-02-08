@@ -164,24 +164,36 @@ aux_part_unnest <- da_cposg %>%
   dplyr::select(id_processo, partes) %>%
   tidyr::unnest(partes)
 
+# readr::write_rds(aux_part_unnest, "data-raw/aux_part_unnest.rds",
+#                  compress = "xz")
+
 ativo <- c(
   "Apelante", "Agravante", "Impetrante",
   "Recorrente", "Autor", "Peticionário",
   "Suscitante", "Reclamante", "ApelanteAMP",
-  "ApteApdo", "ApteApda", "Recorrente",
+  # "ApteApdo", "ApteApda",
+  "Recorrente",
   "Requerente", "Autora", "ImpettePacient",
   "Suscitante", "Suscitado", "Litisconsorte",
-  "ApelanteAMP", "RecteQte", "Peticionária",
-  "RecteRecdo", "Exeqüente", "ApteQte", "ApteQdo"
+  # "ApelanteAMP",
+  # "RecteQte",
+  "Peticionária",
+  "RecteRecdo",
+  # "ApteQte", "ApteQdo",
+  "Exeqüente"
 )
 
 passivo <- c(
   "Apelado", "Agravado", "Apelada",
-  "Agravada", "ApdoApte", "Paciente", "ApdaApte",
+  "Agravada",
+  # "ApdoApte",
+  "Paciente",
+  # "ApdaApte",
   "Corréu", "Recorrido", "Impetrado", "Recorrida",
   "Réu", "Requerido", "Ré", "Corré", "Reclamado",
-  "Requerida", "Querelado", "Impetrada", "Denunciado",
-  "ApdoQte"
+  "Requerida", "Querelado", "Impetrada",
+  # "ApdoQte",
+  "Denunciado"
 )
 
 remover <- c(
