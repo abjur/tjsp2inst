@@ -13,3 +13,14 @@ purrr::walk(datas, ~{
   res
 })
 
+# arqs <- fs::dir_ls(
+#   "/mnt/dados/abj/tjsp/cjsg/2020",
+#   recurse = TRUE,
+#   type = "file",
+#   regexp = "pagina_"
+# )
+#
+# tem_alguma_coisa <- unique(basename(dirname(arqs)))
+# todos <- dir("/mnt/dados/abj/tjsp/cjsg/2020")
+# nao_tem_nada <- setdiff(todos, tem_alguma_coisa)
+# fs::dir_delete(paste0("/mnt/dados/abj/tjsp/cjsg/2020/", nao_tem_nada))

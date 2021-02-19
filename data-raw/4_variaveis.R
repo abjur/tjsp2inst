@@ -41,6 +41,11 @@ readr::write_rds(da_cposg, "data-raw/da_cposg.rds")
 # res_extra <- purrr::map(extra, safe)
 # readr::write_rds(res_extra, "/mnt/dados/abj/tjsp/cposg_parsed/extra.rds")
 
+da_cposg <- readr::read_rds("data-raw/da_cposg.rds")
+
+
+
+
 # id_processo ------------------------------------------------------------
 aux_id_processo <- da_cposg %>%
   dplyr::transmute(id_processo)
@@ -131,6 +136,11 @@ aux_info_comarca <- da_cposg %>%
     id_processo,
     info_comarca = arrumar_comarca(origem)
   )
+
+# # adicionar circunscricao e regiao <<--
+# depara <- abjMaps::d_sf_tjsp$sf$municipio %>%
+#   tibble::as_tibble() %>%
+#   dplyr::distinct(comarca, circunscricao, regiao)
 
 # library(sf)
 # comarca_nm <- abjMaps::d_sf_tjsp$sf$comarca %>%
@@ -327,7 +337,9 @@ aux_dec_unnest <- da_cposg %>%
 aux_dec <- aux_dec_unnest %>%
   dplyr::filter(
     decisao != "",
-    !stringr::str_detect(decisao, stringr::regex("embargo|cancelam", TRUE))
+    !stringr::str_detect(decisao, stringr::regex("embargo|cancelam", TRUE)),
+    # apenas decisoes de 2020
+    lubridate::year(data) == 2020
   ) %>%
   dplyr::transmute(
     id_processo,
@@ -338,6 +350,11 @@ aux_dec <- aux_dec_unnest %>%
   dplyr::filter(dec_val != "Outro") %>%
   dplyr::arrange(dplyr::desc(dec_date)) %>%
   dplyr::distinct(id_processo, .keep_all = TRUE)
+
+# aux_dec %>%
+#   dplyr::mutate(mes = lubridate::floor_date(dec_date, "month")) %>%
+#   dplyr::count(mes) %>%
+#   print(n = 100)
 
 # time_clean ------------------------------------------------------------
 
@@ -378,7 +395,8 @@ da_boletim <- aux_id_processo %>%
     dplyr::across(
       where(~length(unique(.x)) < 1000), as.factor
     )
-  )
+  ) %>%
+  dplyr::filter(info_area != "(Vazio)")
 
 casos_retirados <- aux_id_processo %>%
   dplyr::anti_join(da_boletim, "id_processo")
