@@ -411,7 +411,18 @@ dplyr::glimpse(da_boletim)
 da_boletim_full <- readr::read_rds("data-raw/da_boletim.rds")
 
 tjsp2inst <- da_boletim_full %>%
-  dplyr::select(-part_ativo, -part_passivo) %>%
-  dplyr::mutate(tempo = as.integer(tempo))
+  dplyr::mutate(
+    tempo = as.integer(tempo),
+    part_ativo = ifelse(
+      stringr::str_detect(part_tipo_litigio, "^PF"),
+      "PESSOA FÍSICA",
+      part_ativo
+    ),
+    part_passivo = ifelse(
+      stringr::str_detect(part_tipo_litigio, "-PF$"),
+      "PESSOA FÍSICA",
+      part_passivo
+    )
+  )
 
 usethis::use_data(tjsp2inst, overwrite = TRUE)
