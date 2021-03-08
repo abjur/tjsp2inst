@@ -249,6 +249,7 @@ aux_part_augment <- aux_part_unnest %>%
   dplyr::filter(polo != "remover")
 
 aux_partes <- aux_part_augment %>%
+  dplyr::mutate(nome = ifelse(tipo == "PF", "PESSOA FÍSICA", nome)) %>%
   dplyr::group_by(id_processo, polo) %>%
   dplyr::summarise(
     tipo = dplyr::case_when(
@@ -411,18 +412,6 @@ dplyr::glimpse(da_boletim)
 da_boletim_full <- readr::read_rds("data-raw/da_boletim.rds")
 
 tjsp2inst <- da_boletim_full %>%
-  dplyr::mutate(
-    tempo = as.integer(tempo),
-    part_ativo = ifelse(
-      stringr::str_detect(part_tipo_litigio, "^PF"),
-      "PESSOA FÍSICA",
-      part_ativo
-    ),
-    part_passivo = ifelse(
-      stringr::str_detect(part_tipo_litigio, "-PF$"),
-      "PESSOA FÍSICA",
-      part_passivo
-    )
-  )
+  dplyr::mutate(tempo = as.integer(tempo))
 
 usethis::use_data(tjsp2inst, overwrite = TRUE)
