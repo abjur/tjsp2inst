@@ -310,9 +310,10 @@ aux_dec <- aux_dec_unnest %>%
   ) %>%
   dplyr::transmute(
     id_processo,
+    dec_txt = decisao,
     dec_val = arrumar_decisao(decisao),
     dec_unanime = arrumar_unanime(decisao),
-    dec_date = data
+    dec_date = as.Date(data)
   ) %>%
   dplyr::filter(dec_val != "Outro") %>%
   dplyr::arrange(dplyr::desc(dec_date)) %>%
@@ -338,14 +339,14 @@ aux_tempo <- aux_movs %>%
   dplyr::arrange(data) %>%
   dplyr::distinct(id_processo, .keep_all = TRUE) %>%
   dplyr::inner_join(aux_dec, "id_processo") %>%
-  dplyr::mutate(tempo = as.numeric(dec_date - data)) %>%
+  dplyr::mutate(tempo = as.integer(dec_date - data)) %>%
   dplyr::filter(tempo > 0) %>%
   dplyr::select(id_processo, tempo)
 
 
 # join --------------------------------------------------------------------
 
-da_boletim <- aux_id_processo %>%
+da_boletim_full <- aux_id_processo %>%
   dplyr::inner_join(aux_info_area, "id_processo") %>%
   dplyr::inner_join(aux_info_classe, "id_processo") %>%
   dplyr::inner_join(aux_info_assunto_full, "id_processo") %>%
@@ -360,7 +361,7 @@ da_boletim <- aux_id_processo %>%
   dplyr::mutate(
     dplyr::across(where(is.character), tidyr::replace_na, "(Vazio)"),
     dplyr::across(
-      where(~length(unique(.x)) < 1000), as.factor
+      where(~!any(lubridate::is.Date(.x)) & length(unique(.x)) < 1000), as.factor
     )
   ) %>%
   dplyr::filter(info_area != "(Vazio)")
@@ -368,8 +369,9 @@ da_boletim <- aux_id_processo %>%
 casos_retirados <- aux_id_processo %>%
   dplyr::anti_join(da_boletim, "id_processo")
 
-readr::write_rds(da_boletim, "data-raw/da_boletim.rds", compress = "xz")
 readr::write_rds(casos_retirados, "data-raw/casos_retirados.rds", compress = "xz")
+readr::write_rds(da_boletim_full, "data-raw/da_boletim_full.rds", compress = "xz")
+
 
 
 # export ------------------------------------------------------------------
@@ -378,6 +380,8 @@ dplyr::glimpse(da_boletim)
 da_boletim_full <- readr::read_rds("data-raw/da_boletim.rds")
 
 tjsp2inst <- da_boletim_full %>%
-  dplyr::mutate(tempo = as.integer(tempo))
+  dplyr::select(-dec_txt) %>%
+  dplyr::bind_rows(tjsp2inst::tjsp2inst) %>%
+  dplyr::distinct(id_processo, .keep_all = TRUE)
 
 usethis::use_data(tjsp2inst, overwrite = TRUE)
