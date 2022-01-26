@@ -1,7 +1,7 @@
 library(magrittr)
 
 arqs <- fs::dir_ls(
-  "/mnt/dados/abj/tjsp/cjsg/2020",
+  "/mnt/dados/abj/tjsp/cjsg/2021",
   recurse = TRUE,
   type = "file",
   regexp = "pagina_"
