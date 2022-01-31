@@ -384,4 +384,13 @@ tjsp2inst <- da_boletim_full %>%
   dplyr::bind_rows(tjsp2inst::tjsp2inst) %>%
   dplyr::distinct(id_processo, .keep_all = TRUE)
 
+tjsp2inst <- tjsp2inst %>%
+  dplyr::mutate(dec_ano = as.factor(lubridate::year(dec_date))) %>%
+  dplyr::filter(
+    !info_area %in% "(Vazio)",
+    dec_ano %in% c("2020", "2021")
+  )
+
 usethis::use_data(tjsp2inst, overwrite = TRUE)
+
+
