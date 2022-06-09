@@ -5,7 +5,7 @@
 \alias{tjsp2inst}
 \title{tjsp2inst}
 \format{
-An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 619178 rows and 16 columns.
+An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 1197255 rows and 17 columns.
 }
 \usage{
 tjsp2inst
