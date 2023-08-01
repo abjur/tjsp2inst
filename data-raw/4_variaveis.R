@@ -1,5 +1,52 @@
 library(magrittr)
 
+files_chunks <- "/mnt/dados/abj/tjsp/" |>
+  fs::dir_ls(regexp = "parsed$") |>
+  purrr::map(fs::dir_ls) |>
+  purrr::flatten_chr()
+
+progressr::with_progress({
+  p <- progressr::progressor(length(files_chunks))
+  da_cposg <- purrr::map_dfr(files_chunks, ~{
+    p()
+    purrr::map_dfr(readr::read_rds(.x), "result", .id = "file")
+  }, .id = "file_chunk") %>%
+    dplyr::mutate(id_processo = basename(fs::path_ext_remove(file))) %>%
+    dplyr::distinct(id_processo, .keep_all = TRUE)
+})
+
+da_cposg_old <- readr::read_rds("data-raw/da_cposg.rds")
+da_cposg <- da_cposg_old |>
+  dplyr::bind_rows(da_cposg) |>
+  dplyr::distinct(id_processo, .keep_all = TRUE)
+readr::write_rds(da_cposg, "data-raw/da_cposg.rds")
+
+## re-download problematic files ----
+
+# progressr::with_progress({
+#   p <- progressr::progressor(length(files_chunks))
+#   erros <- purrr::map(files_chunks, ~{
+#     p()
+#     .x %>%
+#       readr::read_rds() %>%
+#       purrr::map("error") %>%
+#       purrr::discard(is.null)
+#   }) %>% purrr::flatten()
+# })
+# length(erros)
+# arquivos <- names(erros)
+# processos <- basename(fs::path_ext_remove(arquivos))
+#
+# extra <- purrr::map_chr(
+#   processos,
+#   lex::tjsp_cposg_download,
+#   "/mnt/dados/abj/tjsp/cposg/extra/"
+# )
+# extra <- fs::dir_ls("/mnt/dados/abj/tjsp/cposg/extra/")
+# safe <- purrr::safely(lex::tjsp_cposg_parse)
+# res_extra <- purrr::map(extra, safe)
+# readr::write_rds(res_extra, "/mnt/dados/abj/tjsp/cposg_parsed/extra.rds")
+
 
 da_cposg <- readr::read_rds("data-raw/da_cposg.rds")
 
@@ -305,8 +352,13 @@ aux_dec <- aux_dec_unnest %>%
   dplyr::filter(
     decisao != "",
     !stringr::str_detect(decisao, stringr::regex("embargo|cancelam", TRUE)),
+<<<<<<< HEAD
+    # apenas decisoes a partir de 2020
+    lubridate::year(data) >= 2020
+=======
     # apenas decisoes de 2021
     lubridate::year(data) == 2021
+>>>>>>> d2e9266deb2f2b4421006e8ad1059549bbe5f9ce
   ) %>%
   dplyr::transmute(
     id_processo,
@@ -326,7 +378,7 @@ aux_dec <- aux_dec_unnest %>%
 
 # time_clean ------------------------------------------------------------
 
-aux_movs <- da_cposg %>%
+emaux_movs <- da_cposg %>%
   dplyr::select(id_processo, movimentacoes) %>%
   tidyr::unnest(movimentacoes)
 
@@ -380,6 +432,9 @@ dplyr::glimpse(da_boletim)
 da_boletim_full <- readr::read_rds("data-raw/da_boletim.rds")
 
 tjsp2inst <- da_boletim_full %>%
+<<<<<<< HEAD
+  dplyr::mutate(tempo = as.integer(tempo))
+=======
   dplyr::select(-dec_txt) %>%
   dplyr::bind_rows(tjsp2inst::tjsp2inst) %>%
   dplyr::distinct(id_processo, .keep_all = TRUE)
@@ -390,6 +445,7 @@ tjsp2inst <- tjsp2inst %>%
     !info_area %in% "(Vazio)",
     dec_ano %in% c("2020", "2021")
   )
+>>>>>>> d2e9266deb2f2b4421006e8ad1059549bbe5f9ce
 
 usethis::use_data(tjsp2inst, overwrite = TRUE)
 

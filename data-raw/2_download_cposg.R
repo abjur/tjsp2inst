@@ -7,38 +7,27 @@ ids_all <- da_cjsg %>%
   abjutils::clean_cnj() %>%
   unique()
 
-path_cposg <- "/mnt/dados/abj/tjsp/cposg_2021"
+ja_foi <- "/mnt/dados/abj/tjsp/" |>
+  fs::dir_ls(type = "directory", regexp = "cposg_[0-9]*$") |>
+  purrr::map(fs::dir_ls, recurse = TRUE, type = "file") |>
+  purrr::flatten_chr(ja_foi) |>
+  unique() %>%
+  basename() %>%
+  fs::path_ext_remove()
 
-## esse codigo nao faz sentido porque gera chunks diferentes
-# ja_foi <- fs::dir_ls(path_cposg) %>%
-#   purrr::map(~{
-#     message(basename(.x))
-#     fs::dir_ls(.x)
-#   }) %>%
-#   purrr::flatten_chr() %>%
-#   unique() %>%
-#   basename() %>%
-#   fs::path_ext_remove()
-#
-# ids_faltam <- setdiff(ids_all, ja_foi)
-
-ids_faltam <- ids_all
+ids_faltam <- setdiff(ids_all, ja_foi)
 size_chunk <- 10000
 chunks <- split(ids_faltam, (seq_along(ids_faltam) - 1) %/% size_chunk + 1)
 
-# purrr::iwalk(chunks, ~{
-#   message(.y)
-#   path_chunk <- sprintf("%s/%03d", path_cposg, as.numeric(.y))
-#   arqs <- fs::dir_ls(path_chunk)
-#   existem <- arqs %>%
-#     basename() %>%
-#     tools::file_path_sans_ext()
-#   deletar <- arqs[!existem %in% .x]
-#   message(paste("deletando", length(deletar), "arquivos..."))
-#   dir_deletar <- unique(dirname(deletar))
-#   message(paste("pasta:", dir_deletar))
-#   fs::dir_delete(dir_deletar)
-# })
+da_chunks <- tibble::tibble(chunk = seq_along(chunks), processo = chunks) %>%
+  tidyr::unnest(processo)
+copiar <- ja_foi %>%
+  tibble::enframe(value = "processo") %>%
+  dplyr::inner_join(da_chunks, "processo") %>%
+  dplyr::mutate(path_chunk = sprintf("%s/%03d/%s.html", path_cposg, chunk, processo)) %>%
+  dplyr::arrange(chunk)
+with(copiar, fs::file_move(name, path_chunk))
+
 
 # fs::dir_create(sprintf("%s/%03d", path_cposg, seq_along(chunks)))
 
